@@ -209,7 +209,7 @@ class Search {
 
 const db = new DB();
 
-const getCountries = () => {
+export const getCountries = () => {
   const countries = db.getCountries();
 
   const response = new Response(JSON.stringify(countries), {
@@ -222,7 +222,7 @@ const getCountries = () => {
   return Promise.resolve(response);
 };
 
-const searchGeo = (string) => {
+export const searchGeo = (string) => {
   const addType = (type) => (entity) => ({ ...entity, type });
 
   const countries = Object.values(db.getCountries()).map(addType("country"));
@@ -281,7 +281,7 @@ const searchGeo = (string) => {
   return Promise.resolve(response);
 };
 
-const startSearchPrices = (countryID) => {
+export const startSearchPrices = (countryID) => {
   if (!countryID) {
     const error = {
       code: 400,
@@ -317,7 +317,7 @@ const startSearchPrices = (countryID) => {
   return Promise.resolve(response);
 };
 
-const getSearchPrices = (token) => {
+export const getSearchPrices = (token) => {
   const search = db.getSearch(token);
 
   if (!search) {
@@ -364,7 +364,7 @@ const getSearchPrices = (token) => {
   return Promise.resolve(response);
 };
 
-const stopSearchPrices = (token) => {
+export const stopSearchPrices = (token) => {
   if (!token || !db.hasSearch(token)) {
     const error = {
       code: 404,
@@ -396,7 +396,7 @@ const stopSearchPrices = (token) => {
   return Promise.resolve(response);
 };
 
-const getHotels = (countryID) => {
+export const getHotels = (countryID) => {
   const hotels = db.getHotelsByCountryID(countryID);
 
   const response = new Response(JSON.stringify(hotels), {
@@ -409,7 +409,7 @@ const getHotels = (countryID) => {
   return Promise.resolve(response);
 };
 
-const getHotel = (hotelId) => {
+export const getHotel = (hotelId) => {
   const hotel = db.getHotel(hotelId);
 
   if (!hotel) {
@@ -435,7 +435,7 @@ const getHotel = (hotelId) => {
   return Promise.resolve(response);
 };
 
-const getPrice = (priceId) => {
+export const getPrice = (priceId) => {
   if (!priceId) {
     const error = {
       code: 404,
