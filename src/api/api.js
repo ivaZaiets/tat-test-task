@@ -229,49 +229,16 @@ export const searchGeo = (string) => {
   const hotels = Object.values(db.getHotels()).map(addType("hotel"));
   const cities = Object.values(db.getCities()).map(addType("city"));
 
-  let geo = {};
+  const geo = [...countries, ...hotels, ...cities];
+  const normalizeString = string.trim().toLowerCase();
 
-  switch (string?.length) {
-    case 2: {
-      const [country] = countries;
-      const [hotelA, hotelB] = hotels;
+  const filteredGeo = normalizeString
+    ? geo.filter((entity) =>
+        entity.name.toLowerCase().includes(normalizeString),
+      )
+    : [];
 
-      geo[country.id] = country;
-      geo[hotelA.id] = hotelA;
-      geo[hotelB.id] = hotelB;
-
-      break;
-    }
-
-    case 3: {
-      const [, , hotelA, hotelB] = hotels;
-      const [cityA, cityB] = cities;
-
-      geo[hotelA.id] = hotelA;
-      geo[hotelB.id] = hotelB;
-      geo[cityA.id] = cityA;
-      geo[cityB.id] = cityB;
-
-      break;
-    }
-
-    case 4: {
-      break;
-    }
-
-    default: {
-      const [, country] = countries;
-      const [, , cityA, cityB] = cities;
-      const [hotelA] = hotels;
-
-      geo[cityA.id] = cityA;
-      geo[cityB.id] = cityB;
-      geo[country.id] = country;
-      geo[hotelA.id] = hotelA;
-    }
-  }
-
-  const response = new Response(JSON.stringify(geo), {
+  const response = new Response(JSON.stringify(filteredGeo), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
