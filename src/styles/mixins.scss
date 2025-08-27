@@ -3,3 +3,9 @@
     @content;
   }
 }
+
+@mixin onMobile {
+  @media (max-width: 560px) {
+    @content;
+  }
+}

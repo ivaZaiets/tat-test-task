@@ -1,4 +1,5 @@
 import Button from "../../ui/Button/Button";
+import Dropdown from "../../ui/Dropdown/Dropdown";
 
 import s from "./Home.module.scss";
 
@@ -27,6 +28,8 @@ const Home = () => {
           <img src="images/man.png" alt="man" />
         </div>
       </div>
+
+      <Dropdown />
     </div>
   );
 };

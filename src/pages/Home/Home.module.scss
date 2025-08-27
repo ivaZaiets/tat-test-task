@@ -2,6 +2,9 @@
 @import "../../styles/mixins.scss";
 
 .container {
+  display: flex;
+  flex-direction: column;
+
   .main {
     position: relative;
     margin-bottom: 62px;
