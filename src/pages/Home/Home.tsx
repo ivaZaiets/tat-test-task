@@ -1,21 +1,22 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 import Button from "../../ui/Button/Button";
 import Dropdown from "../../ui/Dropdown/Dropdown";
 
-import { scrollIntoView } from "../../utils/scrollIntoView";
-
 import type { PriceMap } from "../../interfaces/PriceMap";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 
 import { FadeLoader } from "react-spinners";
 
 import s from "./Home.module.scss";
+import Card from "../../components/Card/Card";
 
 const Home = () => {
   const [items, setItems] = useState<PriceMap[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const cardsRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className={s.container}>
@@ -47,13 +48,26 @@ const Home = () => {
         loading={loading}
         setLoading={setLoading}
         setError={setError}
-        scrollIntoView={() => scrollIntoView(cardsRef)}
       />
 
-      <div className={s.cards} ref={cardsRef}>
-        <h2 style={{ fontSize: 50 }}>Cards</h2>
-        {loading && <FadeLoader />}
-      </div>
+      {loading ? (
+        <FadeLoader className={s.loader} />
+      ) : error ? (
+        <div className={s["error-block"]}>
+          <FontAwesomeIcon className={s.icon} icon={faTriangleExclamation} />
+          <p>{error}</p>
+        </div>
+      ) : (
+        items.length > 0 && (
+          <div className={s.cards}>
+            {items
+              .sort((a, b) => a.amount - b.amount)
+              .map((item) => (
+                <Card key={item.id} item={item} />
+              ))}
+          </div>
+        )
+      )}
     </div>
   );
 };

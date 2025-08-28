@@ -1,0 +1,70 @@
+@import "../../styles/variables.scss";
+
+.card {
+  width: 100%;
+  max-width: 325px;
+  border-radius: 20px;
+  color: $light-black;
+  background: $white;
+  text-decoration: none;
+  transition:
+    transform 0.3s ease-in-out,
+    filter 0.3s ease-in-out;
+  filter: drop-shadow(6px 6px 10px rgba(0, 0, 0, 0.1));
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+
+  img {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+
+    h2,
+    .date,
+    .amount {
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: $primary;
+    }
+
+    .geo-block {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .date,
+    .amount {
+      align-self: flex-end;
+      margin-bottom: 10px;
+      font-family: "Roboto", sans-serif;
+    }
+
+    .amount {
+      color: $secondary;
+    }
+
+    .link {
+      color: rgba(0, 94, 255, 0.6);
+      transition: color 0.3s ease-in-out;
+
+      &:hover {
+        color: darken(rgba(0, 94, 255, 0.6), 10%);
+      }
+    }
+  }
+}

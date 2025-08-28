@@ -7,18 +7,18 @@
 
   .main {
     position: relative;
-    margin-bottom: 62px;
+    margin-bottom: 32px;
 
     &::after {
       content: "";
       position: absolute;
       inset: 0;
-      height: 120%;
+      height: 115%;
       background: $background;
       z-index: -1;
 
       @include onTablet {
-        height: 110%;
+        height: 108%;
       }
     }
 
@@ -96,6 +96,41 @@
         z-index: 1;
         filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.1));
       }
+    }
+  }
+
+  .loader,
+  .error-block {
+    align-self: center;
+  }
+
+  .loader span {
+    background: $primary !important;
+  }
+
+  .error-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 25px;
+
+    .icon {
+      color: rgb(255, 179, 0);
+    }
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 25px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+      justify-items: center;
     }
   }
 }

@@ -12,12 +12,14 @@
     background 0.3s ease-in-out,
     color 0.3s ease-in-out;
 
-  &:hover {
-    background: darken($primary, 10%);
-  }
+  @media (min-width: 961px) {
+    &:hover {
+      background: darken($primary, 10%);
+    }
 
-  &:active {
-    background: lighten($primary, 10%);
+    &:active {
+      background: lighten($primary, 10%);
+    }
   }
 
   &--cover {
@@ -29,9 +31,11 @@
     color: $black;
     background: none;
 
-    &:hover,
-    &:active {
-      color: $white;
+    @media (min-width: 961px) {
+      &:hover,
+      &:active {
+        color: $white;
+      }
     }
   }
 

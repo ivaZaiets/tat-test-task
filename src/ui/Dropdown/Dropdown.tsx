@@ -28,13 +28,11 @@ const Dropdown = ({
   loading,
   setLoading,
   setError,
-  scrollIntoView,
 }: {
   setItems: React.Dispatch<React.SetStateAction<PriceMap[]>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
-  scrollIntoView: () => void;
 }) => {
   const [value, setValue] = useState("");
   const [selected, setSelected] = useState(false);
@@ -73,7 +71,7 @@ const Dropdown = ({
 
   const handleDropdownSubmit = async () => {
     setLoading(true);
-    scrollIntoView();
+    setError("");
 
     const token = Cookies.get("token");
     const countryId =
@@ -95,6 +93,10 @@ const Dropdown = ({
             Object.values(await res.json()),
             currentItem,
           );
+
+          if (prices.length === 0) {
+            setError("No tours found. Try changing settings");
+          }
 
           setItems(prices);
         } catch (err: any) {
