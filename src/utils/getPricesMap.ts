@@ -11,7 +11,7 @@ export const getPricesMap = async (
   items: Price[],
   currentItem: Country | City | Hotel | null,
 ) => {
-  const prices = Object.values(items[0]);
+  const prices: Price[] = Object.values(items[0]);
   const countryId =
     currentItem?.type === "hotel"
       ? (currentItem as Hotel).countryId
@@ -44,7 +44,8 @@ export const getPricesMap = async (
       );
 
       return {
-        id: price.id,
+        id: hotel?.id || "",
+        priceId: price.id,
         name: hotel?.name || "",
         countryName: hotel?.countryName || "",
         cityName: hotel?.cityName || "",

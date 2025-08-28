@@ -46,13 +46,15 @@ const Dropdown = ({
   useEffect(() => {
     getCountries()
       .then((res) => res.json())
-      .then((data) => setCountries(Object.values(data)));
+      .then((data) => setCountries(Object.values(data)))
+      .catch((err) => console.error("Error:", err));
   }, []);
 
   useEffect(() => {
     searchGeo(value)
       .then((res) => res.json())
-      .then((data) => setList(Object.values(data)));
+      .then((data) => setList(Object.values(data)))
+      .catch((err) => console.error("Error:", err));
   }, [value]);
 
   useEffect(() => {

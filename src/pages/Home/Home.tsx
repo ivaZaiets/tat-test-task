@@ -63,7 +63,7 @@ const Home = () => {
             {items
               .sort((a, b) => a.amount - b.amount)
               .map((item) => (
-                <Card key={item.id} item={item} />
+                <Card key={item.id} item={item} maxWidth={325} />
               ))}
           </div>
         )

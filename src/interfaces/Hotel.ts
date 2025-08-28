@@ -1,3 +1,5 @@
+import type { Service } from "./Service";
+
 export interface Hotel {
   id: number;
   name: string;
@@ -7,4 +9,6 @@ export interface Hotel {
   countryId: string;
   countryName: string;
   type: "hotel";
+  description?: string;
+  services?: Service | null;
 }

@@ -2,7 +2,6 @@
 
 .card {
   width: 100%;
-  max-width: 325px;
   border-radius: 20px;
   color: $light-black;
   background: $white;
@@ -28,37 +27,64 @@
     flex-direction: column;
     padding: 20px;
 
-    h2,
-    .date,
-    .amount {
-      margin-bottom: 10px;
-    }
-
     h2 {
+      margin-bottom: 10px;
       font-size: 18px;
       color: $primary;
+    }
+
+    .geo-block,
+    .line,
+    .description,
+    .services {
+      margin-bottom: 20px;
     }
 
     .geo-block {
       display: flex;
       align-items: baseline;
       gap: 5px;
-      margin-bottom: 15px;
       font-size: 14px;
     }
 
-    .date,
-    .amount {
-      align-self: flex-end;
-      margin-bottom: 10px;
-      font-family: "Roboto", sans-serif;
+    .line {
+      width: 100%;
+      border-color: $gray;
     }
 
-    .amount {
-      color: $secondary;
+    .date-amount-block {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+
+      .date-block {
+        display: flex;
+        gap: 5px;
+      }
+
+      .amount {
+        color: $secondary;
+      }
+
+      p {
+        font-family: "Roboto", sans-serif;
+      }
+    }
+
+    .services {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+
+      .service-block {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
     }
 
     .link {
+      width: fit-content;
       color: rgba(0, 94, 255, 0.6);
       transition: color 0.3s ease-in-out;
 
