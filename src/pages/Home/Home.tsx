@@ -1,9 +1,22 @@
+import { useState, useRef } from "react";
+
 import Button from "../../ui/Button/Button";
 import Dropdown from "../../ui/Dropdown/Dropdown";
+
+import { scrollIntoView } from "../../utils/scrollIntoView";
+
+import type { PriceMap } from "../../interfaces/PriceMap";
+
+import { FadeLoader } from "react-spinners";
 
 import s from "./Home.module.scss";
 
 const Home = () => {
+  const [items, setItems] = useState<PriceMap[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const cardsRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className={s.container}>
       <div className={s.main}>
@@ -29,7 +42,18 @@ const Home = () => {
         </div>
       </div>
 
-      <Dropdown />
+      <Dropdown
+        setItems={setItems}
+        loading={loading}
+        setLoading={setLoading}
+        setError={setError}
+        scrollIntoView={() => scrollIntoView(cardsRef)}
+      />
+
+      <div className={s.cards} ref={cardsRef}>
+        <h2 style={{ fontSize: 50 }}>Cards</h2>
+        {loading && <FadeLoader />}
+      </div>
     </div>
   );
 };

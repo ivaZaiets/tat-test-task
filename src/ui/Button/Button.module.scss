@@ -34,4 +34,11 @@
       color: $white;
     }
   }
+
+  &--disabled {
+    outline: 1px solid $light-black;
+    background: $light-black;
+    opacity: 0.2;
+    pointer-events: none;
+  }
 }

@@ -1,11 +1,20 @@
 import { useEffect, useState, useRef } from "react";
 
-import { getCountries, searchGeo } from "../../api/api";
+import Cookies from "js-cookie";
+
+import {
+  getCountries,
+  searchGeo,
+  startSearchPrices,
+  getSearchPrices,
+} from "../../api/api";
 import { getItemIcon } from "../../utils/getItemIcon";
+import { getPricesMap } from "../../utils/getPricesMap";
 
 import type { Country } from "../../interfaces/Country";
 import type { City } from "../../interfaces/City";
 import type { Hotel } from "../../interfaces/Hotel";
+import type { PriceMap } from "../../interfaces/PriceMap";
 
 import Button from "../Button/Button";
 
@@ -14,11 +23,26 @@ import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 
 import s from "./Dropdown.module.scss";
 
-const Dropdown = () => {
+const Dropdown = ({
+  setItems,
+  loading,
+  setLoading,
+  setError,
+  scrollIntoView,
+}: {
+  setItems: React.Dispatch<React.SetStateAction<PriceMap[]>>;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
+  scrollIntoView: () => void;
+}) => {
   const [value, setValue] = useState("");
   const [selected, setSelected] = useState(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [list, setList] = useState<(Country | City | Hotel)[]>([]);
+  const [currentItem, setCurrentItem] = useState<Country | City | Hotel | null>(
+    null,
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,6 +71,57 @@ const Dropdown = () => {
     };
   }, []);
 
+  const handleDropdownSubmit = async () => {
+    setLoading(true);
+    scrollIntoView();
+
+    const token = Cookies.get("token");
+    const countryId =
+      currentItem?.type === "hotel"
+        ? (currentItem as Hotel).countryId
+        : currentItem?.id;
+
+    try {
+      if (token) return;
+      const res = await startSearchPrices(countryId);
+      const tokenInfo: string[] = Object.values(await res.json());
+
+      Cookies.set("token", tokenInfo[0], { expires: new Date(tokenInfo[1]) });
+
+      const polling = async (token: string, retries = 0) => {
+        try {
+          const res = await getSearchPrices(tokenInfo[0]);
+          const prices = await getPricesMap(
+            Object.values(await res.json()),
+            currentItem,
+          );
+
+          setItems(prices);
+        } catch (err: any) {
+          if (err.status === 425) {
+            return new Promise((resolve) =>
+              setTimeout(() => resolve(polling(token)), 4000),
+            );
+          } else if (err.status === 404) {
+            if (retries < 2) {
+              return new Promise((resolve) =>
+                setTimeout(() => resolve(polling(token, retries + 1)), 4000),
+              );
+            } else {
+              console.error("Error:", err);
+              setError("Attempt limit reached. Please try again later");
+            }
+          }
+        }
+      };
+
+      return polling(tokenInfo[0]).finally(() => setLoading(false));
+    } catch (err) {
+      console.error("Error:", err);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={s.container}>
       <div className={s.dropdown} ref={dropdownRef}>
@@ -59,6 +134,11 @@ const Dropdown = () => {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onFocus={() => setSelected(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleDropdownSubmit();
+              }
+            }}
           />
         </div>
 
@@ -77,6 +157,7 @@ const Dropdown = () => {
                   className={`${s.item} ${item.name === value && s["item--active"]}`}
                   onClick={() => {
                     setValue(item.name);
+                    setCurrentItem(item);
                     setSelected(false);
                   }}
                 >
@@ -89,7 +170,14 @@ const Dropdown = () => {
         )}
       </div>
 
-      <Button width={165} height={60} variant="cover" text="Find Tour" />
+      <Button
+        width={165}
+        height={60}
+        variant="cover"
+        text="Find Tour"
+        disabled={!value || loading}
+        onClick={handleDropdownSubmit}
+      />
     </div>
   );
 };

@@ -5,16 +5,21 @@ const Button = ({
   height,
   variant,
   text,
+  disabled,
+  onClick,
 }: {
   width: number;
   height: number;
   variant: "cover" | "link";
   text: string;
+  disabled?: boolean;
+  onClick?: () => void;
 }) => {
   return (
     <button
-      className={`${s.button} ${s[`button--${variant}`]}`}
+      className={`${s.button} ${s[`button--${variant}`]} ${disabled && s[`button--disabled`]}`}
       style={{ width, height }}
+      onClick={onClick}
     >
       {text}
     </button>
