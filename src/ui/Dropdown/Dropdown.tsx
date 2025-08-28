@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import Cookies from "js-cookie";
 
@@ -7,9 +7,11 @@ import {
   searchGeo,
   startSearchPrices,
   getSearchPrices,
+  stopSearchPrices,
 } from "../../api/api";
 import { getItemIcon } from "../../utils/getItemIcon";
 import { getPricesMap } from "../../utils/getPricesMap";
+import { delay } from "../../utils/delay";
 
 import type { Country } from "../../interfaces/Country";
 import type { City } from "../../interfaces/City";
@@ -25,12 +27,10 @@ import s from "./Dropdown.module.scss";
 
 const Dropdown = ({
   setItems,
-  loading,
   setLoading,
   setError,
 }: {
   setItems: React.Dispatch<React.SetStateAction<PriceMap[]>>;
-  loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
 }) => {
@@ -42,6 +42,7 @@ const Dropdown = ({
     null,
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const currentTokenRef = useRef<string>("");
 
   useEffect(() => {
     getCountries()
@@ -75,51 +76,80 @@ const Dropdown = ({
     setLoading(true);
     setError("");
 
-    const token = Cookies.get("token");
+    const activeToken = Cookies.get("token");
+    currentTokenRef.current = "";
     const countryId =
       currentItem?.type === "hotel"
         ? (currentItem as Hotel).countryId
         : currentItem?.id;
 
     try {
-      if (token) return;
+      if (activeToken) {
+        try {
+          await stopSearchPrices(activeToken);
+        } catch (err) {
+          console.error("Error:", err);
+        } finally {
+          Cookies.remove("token");
+        }
+      }
+
       const res = await startSearchPrices(countryId);
       const tokenInfo: string[] = Object.values(await res.json());
 
+      currentTokenRef.current = tokenInfo[0];
       Cookies.set("token", tokenInfo[0], { expires: new Date(tokenInfo[1]) });
 
-      const polling = async (token: string, retries = 0) => {
+      const isTokenValid = () => currentTokenRef.current === tokenInfo[0];
+
+      const polling = async (retries = 0) => {
+        if (!isTokenValid()) {
+          console.warn("Polling cancelled for stale token");
+          return;
+        }
+
         try {
           const res = await getSearchPrices(tokenInfo[0]);
-          const prices = await getPricesMap(
-            Object.values(await res.json()),
-            currentItem,
-          );
+          const data = await res.json();
+
+          if (!isTokenValid()) {
+            console.warn("Ignored response for stale token");
+            return;
+          }
+
+          const prices = await getPricesMap(Object.values(data), currentItem);
 
           if (prices.length === 0) {
             setError("No tours found. Try changing settings");
           }
 
           setItems(prices);
+          setLoading(false);
         } catch (err: any) {
-          if (err.status === 425) {
-            return new Promise((resolve) =>
-              setTimeout(() => resolve(polling(token)), 4000),
-            );
-          } else if (err.status === 404) {
-            if (retries < 2) {
-              return new Promise((resolve) =>
-                setTimeout(() => resolve(polling(token, retries + 1)), 4000),
-              );
-            } else {
-              console.error("Error:", err);
-              setError("Attempt limit reached. Please try again later");
-            }
+          if (!isTokenValid()) {
+            console.warn("Error ignored for stale token");
+            return;
           }
+
+          if (err.status === 425) {
+            await delay(4000);
+            return polling(retries);
+          }
+
+          if (err.status === 404 && retries < 2) {
+            await delay(4000);
+            return polling(retries + 1);
+          }
+
+          console.error("Error:", err);
+          if (err.status === 404) {
+            setError("Attempt limit reached. Please try again later");
+          }
+          setLoading(false);
         }
       };
 
-      return polling(tokenInfo[0]).finally(() => setLoading(false));
+      await polling();
     } catch (err) {
       console.error("Error:", err);
       setLoading(false);
@@ -179,7 +209,7 @@ const Dropdown = ({
         height={60}
         variant="cover"
         text="Find Tour"
-        disabled={!value || loading}
+        disabled={!value}
         onClick={handleDropdownSubmit}
       />
     </div>

@@ -45,7 +45,6 @@ const Home = () => {
 
       <Dropdown
         setItems={setItems}
-        loading={loading}
         setLoading={setLoading}
         setError={setError}
       />
